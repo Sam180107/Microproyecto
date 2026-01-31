@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// Corregimos la ruta para que busque dentro de la carpeta screens
+import 'package:microproyecto/screens/menu_screen.dart';
 import 'screens/game_screen.dart'; 
 
 void main() {
@@ -19,7 +19,7 @@ class MemoryGameApp extends StatelessWidget {
         useMaterial3: true,
       ),
       // Definimos la pantalla de inicio
-      home: const GameScreen(), 
+      home: const MenuScreen(), 
     );
   }
 }
