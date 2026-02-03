@@ -1,14 +1,17 @@
-class CardModel {
-  final int id;         // Un número único para cada carta (0, 1, 2...)
-  final String content;  // El emoji o símbolo que tiene la carta (ej. '🍎')
-  bool isFlipped;       // Nos dice si la carta se está mostrando (volteada)
-  bool isMatched;       // Nos dice si ya encontramos su pareja y debe quedarse fija
+import 'package:flutter/material.dart';
 
-  // Este es el constructor para crear cada carta
+class CardModel {
+  final int id;
+  final String content;
+  bool isFlipped;
+  bool isMatched;
+  Color? color; // Para que cada carta tenga su color propio
+
   CardModel({
     required this.id,
     required this.content,
-    this.isFlipped = false, // Al empezar, todas están tapadas
-    this.isMatched = false, // Al empezar, ninguna tiene pareja
+    this.isFlipped = false,
+    this.isMatched = false,
+    this.color,
   });
 }
