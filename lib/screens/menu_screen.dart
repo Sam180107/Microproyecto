@@ -16,16 +16,12 @@ class _MenuScreenState extends State<MenuScreen> {
   final Color _backgroundColor = const Color(0xFF0F172A);
   final Color _accentCeleste = const Color(0xFF00E5FF);
   final Color _accentAmarillo = const Color(0xFFFFD700);
-  final Color _cardMorado = const Color(0xFF4A148C);
+  
 
-  void _iniciarJuego() {
+  void _iniciarJuego() async {
     if (_nicknameController.text.trim().isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => GameScreen(nickname: _nicknameController.text.trim()),
-        ),
-      );
+      await Navigator.push(context,MaterialPageRoute(builder: (context) => GameScreen(nickname: _nicknameController.text.trim()),),);
+      setState(() {});
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Escribe tu nickname para jugar')),
@@ -37,12 +33,10 @@ class _MenuScreenState extends State<MenuScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _backgroundColor,
-      // CORRECCIÓN CLAVE: El body AHORA es un Stack
       body: Stack(
         children: [
-          // --- HIJO 1: EL FONDO Y MENÚ (Tu Container gigante) ---
           Container(
-            height: double.infinity, // Asegura que ocupe todo el fondo
+            height: double.infinity, 
             width: double.infinity,
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -136,17 +130,15 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
             ),
-          ), // <--- AQUÍ TERMINA EL CONTAINER (HIJO 1)
-
-          // --- HIJO 2: EL PANEL FLOTANTE ---
+          ), 
           Positioned(
             top: 50,
             left: 30,
             child: TopScorersPanel(),
           ),
           
-        ], // <--- AQUÍ CIERRA LA LISTA DE HIJOS (children)
-      ), // <--- AQUÍ CIERRA EL STACK
-    ); // <--- AQUÍ CIERRA EL SCAFFOLD
+        ], 
+      ), 
+    ); 
   }
 }

@@ -19,14 +19,14 @@ class ScoreService {
 
     // 3. ORDENAR (Algoritmo: Menos intentos es mejor. Si empatan, menos tiempo es mejor)
     scores.sort((a, b) {
-      int cmp = a.attempts.compareTo(b.attempts);
+      int cmp = a.attempts.compareTo(b.timeSeconds);
       if (cmp != 0) return cmp;
       return a.timeSeconds.compareTo(b.timeSeconds);
     });
 
     // 4. Mantener solo el Top 10 (opcional)
-    if (scores.length > 10) {
-      scores = scores.sublist(0, 10);
+    if (scores.length > 5) {
+      scores = scores.sublist(0, 5);
     }
 
     // 5. Guardar

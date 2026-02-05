@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import '../models/card_models.dart';
+import '../score.dart';
+import '../score_guardado.dart';
 
 class GameScreen extends StatefulWidget {
   final String nickname;
@@ -23,7 +26,7 @@ class _GameScreenState extends State<GameScreen> {
     const Color(0xFF004D40), const Color(0xFF01579B),
     const Color(0xFF311B92), const Color(0xFF006064),
   ];
-
+  
   @override
   void initState() {
     super.initState();
@@ -57,6 +60,33 @@ class _GameScreenState extends State<GameScreen> {
       if (mounted) setState(() => _segundos++);
     });
   }
+
+  void _confirmarSalida() {
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      backgroundColor: const Color(0xFF1E293B), 
+      title: const Text("¿Abandonar partida?", style: TextStyle(color: Colors.white)),
+      content: const Text(
+        "Si sales ahora, perderás tu progreso actual.",
+        style: TextStyle(color: Colors.white70),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx), 
+          child: const Text("Cancelar", style: TextStyle(color: Colors.grey)),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.isFirst);
+          },
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+          child: const Text("Salir", style: TextStyle(color: Colors.white)),
+        ),
+      ],
+    ),
+  );
+}
 
   void _voltearCarta(int index) {
     if (_selectedIndices.length >= 2 || _cards[index].isMatched || _cards[index].isFlipped) return;
@@ -94,21 +124,34 @@ class _GameScreenState extends State<GameScreen> {
   void _verificarVictoria() {
     if (_cards.every((c) => c.isMatched)) {
       _timer?.cancel();
+      final nuevoScore = ScoreEntry(
+        nickname: widget.nickname,
+        attempts: _intentos,
+        timeSeconds: _segundos,
+      );
+      ScoreService.addScore(nuevoScore);
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (ctx) => AlertDialog(
           backgroundColor: const Color(0xFF1E293B),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text("¡VICTORIA! 🎉", style: TextStyle(color: Colors.amberAccent)),
+          title: const Text("¡VICTORIA!", style: TextStyle(color: Colors.amberAccent)),
           content: Text("¡Increíble ${widget.nickname}!\nLo lograste en $_segundos segundos.", style: const TextStyle(color: Colors.white)),
           actions: [
-            Center(
-              child: ElevatedButton(
-                onPressed: () { Navigator.pop(ctx); setState(() => _generarTablero()); },
-                child: const Text("Jugar de nuevo"),
-              ),
+            TextButton(
+              onPressed: () {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+              },
+              child: const Text("Salir", style: TextStyle(color: Colors.redAccent)),
             ),
+            ElevatedButton(
+              onPressed: () { 
+                Navigator.pop(ctx); 
+                setState(() => _generarTablero()); 
+              },
+              child: const Text("Jugar de nuevo"),
+            ),         
           ],
         ),
       );
@@ -146,6 +189,9 @@ class _GameScreenState extends State<GameScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
+                IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+                    onPressed: _confirmarSalida, ),
                 _infoBox("INTENTOS", "$_intentos", Colors.orangeAccent),
                 _infoBox("TIEMPO", "${_segundos}s", Colors.greenAccent),
               ],
@@ -156,13 +202,11 @@ class _GameScreenState extends State<GameScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: GridView.builder(
                   itemCount: _cards.length,
-                  // PERMITIMOS EL SCROLL CON LA RUEDITA
                   physics: const BouncingScrollPhysics(), 
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 6,
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
-                    // Usamos el cálculo de aspecto para forzar a que quepan
                     childAspectRatio: aspect > 1.4 ? aspect : 1.4, 
                   ),
                   itemBuilder: (context, index) {
